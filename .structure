@@ -1,0 +1,12 @@
+# RepoIntel - AI-Powered Repository Analysis Agent
+
+repo-intel/
+├── src/
+│   ├── agents/
+│   ├── graph/
+│   ├── mcp_server/
+│   │   └── tools/
+│   ├── api/
+│   └── utils/
+├── frontend/
+└── tests/

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RepoIntel — AI Repository Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg: #000000;
+            --bg-elevated: #0a0a0a;
+            --surface: #111111;
+            --surface-2: #1a1a1a;
+            --surface-3: #222222;
+            --text: #e8e8e8;
+            --text-dim: #888888;
+            --text-muted: #555555;
+            --accent: #7c5cfc;
+            --accent-soft: rgba(124, 92, 252, 0.12);
+            --accent-glow: rgba(124, 92, 252, 0.25);
+            --green: #22c55e;
+            --green-soft: rgba(34, 197, 94, 0.1);
+            --red: #ef4444;
+            --amber: #f59e0b;
+            --border: #1a1a1a;
+            --border-subtle: #222222;
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* === HEADER === */
+        .header {
+            padding: 4rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .logo {
+            position: relative;
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: #fff;
+        }
+        .logo span {
+            background: linear-gradient(135deg, #7c5cfc 0%, #a78bfa 50%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .tagline {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+
+        /* === CONTAINER === */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+        }
+
+        /* === INPUT === */
+        .input-wrapper {
+            display: flex;
+            gap: 0;
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            margin-bottom: 2.5rem;
+        }
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+        .input-wrapper input {
+            flex: 1;
+            padding: 1rem 1.25rem;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+        }
+        .input-wrapper input::placeholder {
+            color: var(--text-muted);
+        }
+        .input-wrapper button {
+            padding: 1rem 2rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: background 0.15s;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+        }
+        .input-wrapper button:hover:not(:disabled) {
+            background: #6b4ce0;
+        }
+        .input-wrapper button:disabled {
+            background: var(--surface-3);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        /* === STATUS PANEL === */
+        .status-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+        }
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.25; }
+        }
+
+        .log-list {
+            list-style: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            line-height: 1.8;
+        }
+        .log-list li {
+            padding: 0.3rem 0 0.3rem 1rem;
+            border-left: 2px solid var(--border-subtle);
+            color: var(--text-dim);
+            animation: fadeSlide 0.25s ease-out;
+        }
+        .log-list li:last-child {
+            border-left-color: var(--accent);
+            color: var(--text);
+        }
+        .log-list li.error {
+            border-left-color: var(--red);
+            color: var(--red);
+        }
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateX(-8px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* === REPORT === */
+        .report-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            display: none;
+            animation: reportIn 0.4s ease-out;
+        }
+        @keyframes reportIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === MARKDOWN REPORT STYLES === */
+        .report-content h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+        .report-content h1:first-child {
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 1.25rem;
+        }
+        .report-content h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 2rem 0 0.75rem 0;
+            color: #c4b5fd;
+            letter-spacing: -0.01em;
+        }
+        .report-content h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.5rem 0;
+            color: var(--text);
+        }
+        .report-content p {
+            color: var(--text-dim);
+            margin-bottom: 0.75rem;
+            font-size: 0.92rem;
+        }
+        .report-content strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        .report-content ul, .report-content ol {
+            padding-left: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-dim);
+            font-size: 0.92rem;
+        }
+        .report-content li {
+            margin-bottom: 0.35rem;
+        }
+        .report-content li strong {
+            color: var(--text);
+        }
+        .report-content code {
+            background: var(--accent-soft);
+            color: #a78bfa;
+            padding: 0.12em 0.4em;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .report-content pre {
+            background: #0a0a0a;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            margin: 0.75rem 0;
+        }
+        .report-content pre code {
+            background: none;
+            color: var(--text-dim);
+            padding: 0;
+        }
+        .report-content blockquote {
+            border-left: 3px solid var(--accent);
+            padding: 0.5rem 1rem;
+            margin: 1rem 0;
+            background: var(--accent-soft);
+            border-radius: 0 8px 8px 0;
+            color: var(--text-dim);
+            font-size: 0.88rem;
+        }
+        .report-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.75rem 0;
+            font-size: 0.9rem;
+        }
+        .report-content th, .report-content td {
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--border-subtle);
+            text-align: left;
+        }
+        .report-content th {
+            background: var(--surface-2);
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .report-content td {
+            color: var(--text-dim);
+        }
+        .report-content hr {
+            border: none;
+            border-top: 1px solid var(--border-subtle);
+            margin: 1.5rem 0;
+        }
+
+        /* === SPINNER === */
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--surface-3);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* === FOOTER === */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            letter-spacing: 0.02em;
+        }
+        .footer a {
+            color: var(--text-dim);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo"><span>Repo</span>Intel</div>
+        <p class="tagline">AI-Powered Repository Intelligence Report</p>
+    </div>
+    
+    <div class="container">
+        <div class="input-wrapper">
+            <input type="text" id="repoUrl" placeholder="https://github.com/owner/repo" value="">
+            <button id="analyzeBtn" onclick="startAnalysis()">Analyze</button>
+        </div>
+
+        <div id="statusPanel" class="status-panel">
+            <div class="status-header">
+                <div class="status-dot"></div>
+                Agents Running
+            </div>
+            <ul id="logList" class="log-list"></ul>
+        </div>
+
+        <div id="reportPanel" class="report-panel">
+            <div id="reportContent" class="report-content"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        RepoIntel &mdash; LangGraph + Gemini
+    </div>
+
+    <script>
+        let ws = null;
+
+        async function startAnalysis() {
+            const urlInput = document.getElementById('repoUrl').value.trim();
+            if (!urlInput) return alert('Please enter a GitHub URL');
+            if (!urlInput.includes('github.com/')) return alert('Please enter a valid GitHub URL');
+
+            const btn = document.getElementById('analyzeBtn');
+            const statusPanel = document.getElementById('statusPanel');
+            const logList = document.getElementById('logList');
+            const reportPanel = document.getElementById('reportPanel');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Running';
+            statusPanel.style.display = 'block';
+            reportPanel.style.display = 'none';
+            logList.innerHTML = '<li>Initializing agents...</li>';
+
+            try {
+                const res = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({repo_url: urlInput})
+                });
+                
+                const data = await res.json();
+                connectWebSocket(data.job_id);
+            } catch (err) {
+                const li = document.createElement('li');
+                li.className = 'error';
+                li.innerText = `Failed: ${err.message}`;
+                logList.appendChild(li);
+                btn.disabled = false;
+                btn.innerHTML = 'Analyze';
+            }
+        }
+
+        function connectWebSocket(jobId) {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}/api/ws/${jobId}`);
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                const logList = document.getElementById('logList');
+
+                if (data.type === 'progress') {
+                    const li = document.createElement('li');
+                    const time = new Date().toLocaleTimeString();
+                    const icons = {
+                        'supervisor': '🧠',
+                        'repo_scanner': '📂',
+                        'engineering_analyzer': '🔬',
+                        'report_generator': '📝'
+                    };
+                    const icon = icons[data.agent] || '⚡';
+                    li.innerHTML = `<span style="color:#444">${time}</span> ${icon} ${data.message}`;
+                    logList.appendChild(li);
+                    li.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } 
+                else if (data.type === 'completed') {
+                    showReport(data.report);
+                    ws.close();
+                }
+                else if (data.type === 'error') {
+                    const li = document.createElement('li');
+                    li.className = 'error';
+                    li.innerText = `Error: ${data.message}`;
+                    logList.appendChild(li);
+                    
+                    const btn = document.getElementById('analyzeBtn');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Retry';
+                }
+            };
+
+            ws.onclose = () => {
+                // If report wasn't shown via WS, poll for it
+                setTimeout(async () => {
+                    const reportPanel = document.getElementById('reportPanel');
+                    if (reportPanel.style.display === 'none') {
+                        try {
+                            const res = await fetch(`/api/report/${jobId}`);
+                            const data = await res.json();
+                            if (data.report) showReport(data.report);
+                        } catch(e) {}
+                    }
+                }, 1000);
+            };
+
+            ws.onerror = () => {
+                const btn = document.getElementById('analyzeBtn');
+                btn.disabled = false;
+                btn.innerHTML = 'Retry';
+            };
+        }
+
+        function showReport(reportMarkdown) {
+            const reportPanel = document.getElementById('reportPanel');
+            const reportContent = document.getElementById('reportContent');
+            
+            reportContent.innerHTML = marked.parse(reportMarkdown || 'No report generated.');
+            reportPanel.style.display = 'block';
+            reportPanel.scrollIntoView({ behavior: 'smooth' });
+            
+            const btn = document.getElementById('analyzeBtn');
+            btn.disabled = false;
+            btn.innerHTML = 'Analyze Another';
+        }
+    </script>
+</body>
+</html>
