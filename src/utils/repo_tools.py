@@ -15,7 +15,7 @@ def clone_repo(repo_url: str) -> str:
     """Clones a GitHub repository to a temporary directory. Returns the path or error string."""
     temp_dir = tempfile.mkdtemp(prefix="repo-intel-")
     try:
-        Repo.clone_from(repo_url, temp_dir)
+        Repo.clone_from(repo_url, temp_dir, depth=1)
         return temp_dir
     except Exception as e:
         # Clean up on failure

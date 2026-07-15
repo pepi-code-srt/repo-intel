@@ -26,6 +26,10 @@ graph = build_graph()
 
 @router.post("/analyze", response_model=AnalyzeResponse)
 async def start_analysis(req: AnalyzeRequest):
+    import re
+    if not req.repo_url or not re.match(r"^https://github\.com/[^/]+/[^/]+/?$", req.repo_url):
+        raise HTTPException(status_code=400, detail="Invalid repository URL. Only public https://github.com/ URLs are supported.")
+
     job_id = str(uuid.uuid4())
     jobs[job_id] = {
         "status": "pending",
@@ -84,18 +88,35 @@ async def run_analysis(job_id: str, repo_url: str):
     }
 
     cloned_path = None
+    import time
+    start_time = time.time()
+    last_time = start_time
+    stage_times = {}
+
+    # Map node names to display names
+    stage_names = {
+        "repo_scanner": "Structural Scan",
+        "evidence_selector": "Evidence Selection",
+        "engineering_analyzer": "AI Analysis",
+        "report_generator": "Report Rendering"
+    }
 
     try:
         async for output in graph.astream(initial_state, config={"recursion_limit": 10}):
+            now = time.time()
             for node_name, state_update in output.items():
+                duration = now - last_time
+                last_time = now
+                stage_times[node_name] = duration
+
                 # Generate user-facing progress messages based on node
                 if node_name == "repo_scanner":
                     if "_error" in state_update.get("repo_structure", {}):
-                        msg = "❌ Repository clone failed"
+                        msg = f"❌ Repository clone failed ({duration:.1f}s)"
                     else:
                         stats = state_update.get("repo_statistics", {})
                         msg = (
-                            f"✓ Repository cloned and scanned — "
+                            f"✓ Repository cloned and scanned ({duration:.1f}s) — "
                             f"{stats.get('total_files', '?')} files, "
                             f"{stats.get('lines_of_code', '?'):,} LOC"
                         )
@@ -114,11 +135,11 @@ async def run_analysis(job_id: str, repo_url: str):
 
                     if mode in ("ai_enhanced", "ai_enhanced_fallback"):
                         fallback_note = " (fallback model)" if mode == "ai_enhanced_fallback" else ""
-                        msg = f"✓ AI engineering analysis completed{fallback_note} (model: {ai_model})"
+                        msg = f"✓ AI engineering analysis completed{fallback_note} ({duration:.1f}s, model: {ai_model})"
                     else:
                         reason = state_update.get("fallback_reason", "unknown")
                         error_msg = state_update.get("error_message", "")
-                        msg = f"⚠ AI analysis unavailable ({reason}). Structural analysis completed."
+                        msg = f"⚠ AI analysis unavailable ({reason}). Structural analysis completed ({duration:.1f}s)."
                         if error_msg:
                             await send_progress(job_id, f"ℹ {error_msg}", "system")
                         fix = state_update.get("fix_instructions", "")
@@ -126,10 +147,9 @@ async def run_analysis(job_id: str, repo_url: str):
                             await send_progress(job_id, f"💡 How to fix: {fix}", "system")
 
                 elif node_name == "report_generator":
-                    msg = "✓ Final report generated"
-
+                    msg = f"✓ Final report generated ({duration:.2f}s)"
                 else:
-                    msg = f"✓ {node_name} completed"
+                    msg = f"✓ {node_name} completed ({duration:.1f}s)"
 
                 await send_progress(job_id, msg, node_name)
 
@@ -140,6 +160,16 @@ async def run_analysis(job_id: str, repo_url: str):
                 # Capture the final report
                 if "final_report" in state_update and state_update["final_report"]:
                     jobs[job_id]["report"] = state_update["final_report"]
+
+        # Append timing to the report if it exists
+        if jobs[job_id].get("report"):
+            total_time = time.time() - start_time
+            timing_md = "\n\n### ⏱️ Analysis Timing\n| Stage | Duration |\n|-------|----------|\n"
+            for node, duration in stage_times.items():
+                name = stage_names.get(node, node)
+                timing_md += f"| {name} | {duration:.2f}s |\n"
+            timing_md += f"| **Total** | **{total_time:.2f}s** |\n"
+            jobs[job_id]["report"] += timing_md
 
         jobs[job_id]["status"] = "completed"
         logger.info(f"Job {job_id} completed successfully.")
