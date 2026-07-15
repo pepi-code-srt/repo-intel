@@ -8,4 +8,4 @@
 - [x] **Unsupported or unverified claims were removed or corrected during the audit.**
 - **README Verified**: YES. Updated to strictly reflect tested architecture.
 - **Secrets Detected**: NO. `.env.example` uses safe placeholders.
-- **Remaining Limitations**: Only supports public GitHub repositories. Extremely large monorepos may still challenge LLM context windows despite aggressive character minification.
+- **Remaining Limitations**: Only supports public GitHub repositories. Extremely large monorepos may still challenge LLM context windows despite payload minification.

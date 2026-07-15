@@ -14,7 +14,7 @@ RepoIntel uses a **Supervisor-Worker Agent Architecture** powered by LangGraph. 
 
 ## Important Engineering Decisions
 1. **Zero-Token Deterministic Fallbacks**: Rather than crashing when the LLM API is unavailable or exhausted, the system catches the failure and generates a fully formatted report based strictly on the heuristic data gathered by the `repo_scanner` agent, using 0 tokens.
-2. **Payload Minification**: Implemented a pre-processor (`minify_content`) that strips consecutive blank lines and trailing whitespaces from source files before LLM ingestion, heavily reducing payload characters without losing semantic meaning.
+2. **Payload Minification**: Implemented a pre-processor (`minify_content`) that removes blank lines and trailing whitespace from selected source files before LLM ingestion, reducing payload characters while preserving the remaining non-blank line content.
 3. **Ephemeral Storage Pattern**: Used FastAPI lifespan context managers and strict `finally` blocks to ensure temporary `git clone` directories are purged immediately after analysis or upon unexpected server shutdown.
 
 ## Challenges Encountered & Solved
