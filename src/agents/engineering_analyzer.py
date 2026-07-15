@@ -14,16 +14,13 @@ def engineering_analyzer_agent(state: RepoIntelState) -> dict:
     
     repo_path = state.get("repo_path", "")
     
-    # Read relevant files
-    def _minify(content):
-        # Remove consecutive blank lines and excessive trailing whitespace
-        return "\n".join(line.rstrip() for line in content.splitlines() if line.strip()) if content else ""
+    from ..utils.text_utils import minify_content
 
-    dockerfile = _minify(read_file_content(repo_path, "Dockerfile", max_chars=1500)) if repo_path else ""
-    docker_compose = _minify(read_file_content(repo_path, "docker-compose.yml", max_chars=1500)) if repo_path else ""
-    env_example = _minify(read_file_content(repo_path, ".env.example", max_chars=1000)) if repo_path else ""
-    gitignore = _minify(read_file_content(repo_path, ".gitignore", max_chars=1000)) if repo_path else ""
-    readme_snippet = _minify((state.get('readme_content', '') or '')[:1000])
+    dockerfile = minify_content(read_file_content(repo_path, "Dockerfile", max_chars=1500)) if repo_path else ""
+    docker_compose = minify_content(read_file_content(repo_path, "docker-compose.yml", max_chars=1500)) if repo_path else ""
+    env_example = minify_content(read_file_content(repo_path, ".env.example", max_chars=1000)) if repo_path else ""
+    gitignore = minify_content(read_file_content(repo_path, ".gitignore", max_chars=1000)) if repo_path else ""
+    readme_snippet = minify_content((state.get('readme_content', '') or '')[:1000])
     
     deps = state.get('dependencies', [])
     deps_str = "\n".join(deps[:30]) if deps else "No dependencies found"
@@ -34,7 +31,7 @@ def engineering_analyzer_agent(state: RepoIntelState) -> dict:
     source_samples = state.get('source_samples', {})
     source_context = ""
     for filepath, content in list(source_samples.items())[:3]:
-        minified_content = _minify(content[:1500])
+        minified_content = minify_content(content[:1500])
         source_context += f"\n--- {filepath} ---\n{minified_content}\n"
         
     metrics = state.get("repo_statistics", {})

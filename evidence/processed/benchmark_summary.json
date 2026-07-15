@@ -1,0 +1,26 @@
+{
+  "metadata": {
+    "timestamp": "2026-07-15T10:36:06.360871Z",
+    "os": "nt",
+    "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "git_hash": "b3b3fa9"
+  },
+  "runs": [
+    {
+      "repo_url": "https://github.com/octocat/Hello-World",
+      "success": true,
+      "duration_seconds": 6.5,
+      "events": 7,
+      "test_configuration_expected_fallback": true,
+      "raw_events_file": "C:\\Users\\ozave\\OneDrive\\Desktop\\projects\\repo-intel\\evidence\\raw\\ws_events_26b4a489-9618-4399-b2fc-e4ec24cd79eb.json"
+    },
+    {
+      "repo_url": "https://github.com/pallets/click",
+      "success": true,
+      "duration_seconds": 7.25,
+      "events": 7,
+      "test_configuration_expected_fallback": true,
+      "raw_events_file": "C:\\Users\\ozave\\OneDrive\\Desktop\\projects\\repo-intel\\evidence\\raw\\ws_events_50a3094b-ba8f-4623-a55d-d862c97b11f2.json"
+    }
+  ]
+}

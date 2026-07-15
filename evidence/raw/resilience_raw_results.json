@@ -1,0 +1,31 @@
+{
+  "minification": {
+    "raw_length": 86,
+    "minified_length": 53,
+    "reduction_percent": 38.37
+  },
+  "cleanup": {
+    "created": 2,
+    "removed": 2,
+    "remaining": 0,
+    "success": true
+  },
+  "api_rotation": {
+    "success": true
+  },
+  "exponential_backoff": {
+    "success": true,
+    "sleep_sequence": [
+      2,
+      4,
+      8
+    ]
+  },
+  "all_keys_exhausted": {
+    "success": true
+  },
+  "deterministic_fallback": {
+    "success": true,
+    "status": "QuotaExceeded"
+  }
+}

@@ -1,0 +1,55 @@
+INFO:     Started server process [4332]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8001 (Press CTRL+C to quit)
+========================================
+RepoIntel Config Loaded
+  API Keys Loaded: 1
+  Primary Key prefix: your_gem...
+  Model: gemini-2.5-flash
+========================================
+INFO:     127.0.0.1:57643 - "GET /api/health HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57683 - "POST /api/analyze HTTP/1.1" 200 OK
+{"timestamp": "2026-07-15T10:35:54.629522Z", "level": "INFO", "name": "src.api.routes", "message": "Starting analysis for job 26b4a489-9618-4399-b2fc-e4ec24cd79eb: https://github.com/octocat/Hello-World"}
+{"timestamp": "2026-07-15T10:35:54.637581Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'supervisor' completed its task."}
+INFO:     127.0.0.1:57695 - "WebSocket /api/ws/26b4a489-9618-4399-b2fc-e4ec24cd79eb" [accepted]
+INFO:     connection open
+{"timestamp": "2026-07-15T10:35:57.785738Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'repo_scanner' completed its task."}
+{"timestamp": "2026-07-15T10:35:57.787775Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'supervisor' completed its task."}
+Non-retriable error on API Key #1: Error calling model 'gemini-2.5-flash' (INVALID_ARGUMENT): 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'API key not valid. Please pass a valid API key.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'API_KEY_INVALID', 'domain': 'googleapis.com', 'metadata': {'service': 'generativelanguage.googleapis.com'}}, {'@type': 'type.googleapis.com/google.rpc.LocalizedMessage', 'locale': 'en-US', 'message': 'API key not valid. Please pass a valid API key.'}]}}
+Exhausted retries for API Key #1. Switching to next key if available.
+All API keys and retries exhausted.
+Engineering Analysis failed: Error calling model 'gemini-2.5-flash' (INVALID_ARGUMENT): 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'API key not valid. Please pass a valid API key.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'API_KEY_INVALID', 'domain': 'googleapis.com', 'metadata': {'service': 'generativelanguage.googleapis.com'}}, {'@type': 'type.googleapis.com/google.rpc.LocalizedMessage', 'locale': 'en-US', 'message': 'API key not valid. Please pass a valid API key.'}]}}
+{"timestamp": "2026-07-15T10:35:58.466944Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'engineering_analyzer' completed its task."}
+{"timestamp": "2026-07-15T10:35:58.468978Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'supervisor' completed its task."}
+Non-retriable error on API Key #1: Error calling model 'gemini-2.5-flash' (INVALID_ARGUMENT): 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'API key not valid. Please pass a valid API key.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'API_KEY_INVALID', 'domain': 'googleapis.com', 'metadata': {'service': 'generativelanguage.googleapis.com'}}, {'@type': 'type.googleapis.com/google.rpc.LocalizedMessage', 'locale': 'en-US', 'message': 'API key not valid. Please pass a valid API key.'}]}}
+Exhausted retries for API Key #1. Switching to next key if available.
+All API keys and retries exhausted.
+Report generation failed: Error calling model 'gemini-2.5-flash' (INVALID_ARGUMENT): 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'API key not valid. Please pass a valid API key.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'API_KEY_INVALID', 'domain': 'googleapis.com', 'metadata': {'service': 'generativelanguage.googleapis.com'}}, {'@type': 'type.googleapis.com/google.rpc.LocalizedMessage', 'locale': 'en-US', 'message': 'API key not valid. Please pass a valid API key.'}]}}
+{"timestamp": "2026-07-15T10:35:59.072649Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'report_generator' completed its task."}
+{"timestamp": "2026-07-15T10:35:59.073768Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'supervisor' completed its task."}
+{"timestamp": "2026-07-15T10:35:59.073768Z", "level": "INFO", "name": "src.api.routes", "message": "Job 26b4a489-9618-4399-b2fc-e4ec24cd79eb completed successfully."}
+{"timestamp": "2026-07-15T10:35:59.081646Z", "level": "INFO", "name": "src.api.routes", "message": "Cleaned up cloned repo: C:\\Users\\ozave\\AppData\\Local\\Temp\\repo-intel-q_9_pn_l"}
+{"timestamp": "2026-07-15T10:35:59.082664Z", "level": "INFO", "name": "src.api.routes", "message": "WebSocket disconnected for job 26b4a489-9618-4399-b2fc-e4ec24cd79eb"}
+INFO:     127.0.0.1:52743 - "POST /api/analyze HTTP/1.1" 200 OK
+{"timestamp": "2026-07-15T10:36:01.107404Z", "level": "INFO", "name": "src.api.routes", "message": "Starting analysis for job 50a3094b-ba8f-4623-a55d-d862c97b11f2: https://github.com/pallets/click"}
+{"timestamp": "2026-07-15T10:36:01.111390Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'supervisor' completed its task."}
+INFO:     127.0.0.1:49678 - "WebSocket /api/ws/50a3094b-ba8f-4623-a55d-d862c97b11f2" [accepted]
+INFO:     connection open
+{"timestamp": "2026-07-15T10:36:05.171739Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'repo_scanner' completed its task."}
+{"timestamp": "2026-07-15T10:36:05.174744Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'supervisor' completed its task."}
+Non-retriable error on API Key #1: Error calling model 'gemini-2.5-flash' (INVALID_ARGUMENT): 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'API key not valid. Please pass a valid API key.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'API_KEY_INVALID', 'domain': 'googleapis.com', 'metadata': {'service': 'generativelanguage.googleapis.com'}}, {'@type': 'type.googleapis.com/google.rpc.LocalizedMessage', 'locale': 'en-US', 'message': 'API key not valid. Please pass a valid API key.'}]}}
+Exhausted retries for API Key #1. Switching to next key if available.
+All API keys and retries exhausted.
+Engineering Analysis failed: Error calling model 'gemini-2.5-flash' (INVALID_ARGUMENT): 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'API key not valid. Please pass a valid API key.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'API_KEY_INVALID', 'domain': 'googleapis.com', 'metadata': {'service': 'generativelanguage.googleapis.com'}}, {'@type': 'type.googleapis.com/google.rpc.LocalizedMessage', 'locale': 'en-US', 'message': 'API key not valid. Please pass a valid API key.'}]}}
+{"timestamp": "2026-07-15T10:36:05.677570Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'engineering_analyzer' completed its task."}
+{"timestamp": "2026-07-15T10:36:05.678570Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'supervisor' completed its task."}
+Non-retriable error on API Key #1: Error calling model 'gemini-2.5-flash' (INVALID_ARGUMENT): 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'API key not valid. Please pass a valid API key.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'API_KEY_INVALID', 'domain': 'googleapis.com', 'metadata': {'service': 'generativelanguage.googleapis.com'}}, {'@type': 'type.googleapis.com/google.rpc.LocalizedMessage', 'locale': 'en-US', 'message': 'API key not valid. Please pass a valid API key.'}]}}
+Exhausted retries for API Key #1. Switching to next key if available.
+All API keys and retries exhausted.
+Report generation failed: Error calling model 'gemini-2.5-flash' (INVALID_ARGUMENT): 400 INVALID_ARGUMENT. {'error': {'code': 400, 'message': 'API key not valid. Please pass a valid API key.', 'status': 'INVALID_ARGUMENT', 'details': [{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', 'reason': 'API_KEY_INVALID', 'domain': 'googleapis.com', 'metadata': {'service': 'generativelanguage.googleapis.com'}}, {'@type': 'type.googleapis.com/google.rpc.LocalizedMessage', 'locale': 'en-US', 'message': 'API key not valid. Please pass a valid API key.'}]}}
+{"timestamp": "2026-07-15T10:36:06.319875Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'report_generator' completed its task."}
+{"timestamp": "2026-07-15T10:36:06.319875Z", "level": "INFO", "name": "src.api.routes", "message": "Agent 'supervisor' completed its task."}
+{"timestamp": "2026-07-15T10:36:06.319875Z", "level": "INFO", "name": "src.api.routes", "message": "Job 50a3094b-ba8f-4623-a55d-d862c97b11f2 completed successfully."}
+{"timestamp": "2026-07-15T10:36:06.335871Z", "level": "INFO", "name": "src.api.routes", "message": "Cleaned up cloned repo: C:\\Users\\ozave\\AppData\\Local\\Temp\\repo-intel-rb6omezr"}
+{"timestamp": "2026-07-15T10:36:06.335871Z", "level": "INFO", "name": "src.api.routes", "message": "WebSocket disconnected for job 50a3094b-ba8f-4623-a55d-d862c97b11f2"}

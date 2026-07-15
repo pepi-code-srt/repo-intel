@@ -1,0 +1,12 @@
+{
+  "minification": {
+    "raw_length": 86,
+    "minified_length": 53,
+    "reduction_percent": 38.37
+  },
+  "cleanup": true,
+  "api_rotation": true,
+  "exponential_backoff": true,
+  "all_keys_exhausted": true,
+  "deterministic_fallback": true
+}
