@@ -39,9 +39,9 @@ Tested the LangGraph orchestration end-to-end on two real public repositories. B
 
 | Repository | Status | Events Streamed | Total Duration |
 |------------|--------|-----------------|----------------|
-| `octocat/Hello-World` | **SUCCESS** | 7 WebSocket events | 7.48s |
-| `pallets/click` | **SUCCESS** | 7 WebSocket events | 10.27s |
+| `octocat/Hello-World` | **SUCCESS** | 7 WebSocket events | 7.64s |
+| `pallets/click` | **SUCCESS** | 7 WebSocket events | 9.19s |
 
 **Findings**:
 1. During a local Windows 11 test on 2026-07-15, two public repositories completed the end-to-end workflow in deterministic fallback mode.
-2. Observed wall-clock durations were 7.48s and 10.27s, with 7 WebSocket events captured for each run.
+2. Observed wall-clock durations were 7.64s and 9.19s, with 7 WebSocket events captured for each run.

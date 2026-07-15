@@ -7,7 +7,7 @@ It ingests a public GitHub repository, orchestrates multiple specialized AI agen
 
 * **Multi-Agent Orchestration**: Utilizes a LangGraph Supervisor pattern to coordinate specialized agents (Engineering Analyzer, Repository Scanner).
 * **Resilient Infrastructure**: Implements exponential backoff, API key rotation, and a deterministic zero-token fallback engine to survive rate-limit exhaustion.
-* **Aggressive Context Optimization**: Employs a custom semantic minifier that strips excessive whitespace, comments, and structure to reduce LLM payload sizes by over 35%.
+* **Payload Minification**: Uses a lightweight preprocessor to remove blank lines and trailing whitespace before selected code/configuration content is sent to the LLM.
 * **Real-time Event Streaming**: Streams status updates to the client via asynchronous WebSockets.
 
 ---
@@ -87,7 +87,7 @@ graph TD
 
 We have conducted strict resilience and benchmark testing. All testing scripts are available in `scripts/` and full results are in `evidence/reports/BENCHMARK_REPORT.md`.
 
-* **End-to-End Analysis**: During a local Windows 11 test on 2026-07-15, two public repositories completed the end-to-end workflow in deterministic fallback mode. Observed wall-clock durations were 7.48s and 10.27s, with 7 WebSocket events captured for each run.
+* **End-to-End Analysis**: During a local Windows 11 test on 2026-07-15, two public repositories completed the end-to-end workflow in deterministic fallback mode. Observed wall-clock durations were 7.64s and 9.19s, with 7 WebSocket events captured for each run.
 * **Payload Minification**: In one synthetic whitespace-heavy code sample, the production minifier automatically stripped semantic whitespace resulting in a **38.37% payload character reduction** before sending to the LLM.
 * **Graceful Degradation**: If the API key is exhausted or invalid, the system automatically falls back to a deterministic 0-token report generator, successfully streaming the completion event without crashing. (Verified via isolated mock tests and E2E runs).
 

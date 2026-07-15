@@ -142,7 +142,8 @@ def _build_fallback_report(state: RepoIntelState) -> str:
     for key in ["code_quality", "security", "devops"]:
         f = agent_findings.get(key, {})
         for w in f.get("weaknesses", []):
-            all_weaknesses.append(w)
+            if w not in all_weaknesses:
+                all_weaknesses.append(w)
     
     # Collect all recommendations
     all_recs = []
