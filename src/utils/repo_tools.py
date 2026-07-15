@@ -1,17 +1,30 @@
+"""
+RepoIntel — Repository Tools
+All repository operations: clone, scan, read files, compute metrics.
+Extracted from the old mcp_server/tools/ — no MCP dependency needed.
+"""
 import os
+import json
 import shutil
 import tempfile
 from git import Repo
 import requests
 
+
 def clone_repo(repo_url: str) -> str:
-    """Clones a GitHub repository to a temporary directory."""
+    """Clones a GitHub repository to a temporary directory. Returns the path or error string."""
     temp_dir = tempfile.mkdtemp(prefix="repo-intel-")
     try:
         Repo.clone_from(repo_url, temp_dir)
         return temp_dir
     except Exception as e:
+        # Clean up on failure
+        try:
+            shutil.rmtree(temp_dir, ignore_errors=True)
+        except Exception:
+            pass
         return f"Error cloning repo: {str(e)}"
+
 
 def get_repo_structure(repo_path: str, max_depth: int = 3) -> dict:
     """Returns the directory structure of the cloned repository."""
@@ -37,6 +50,7 @@ def get_repo_structure(repo_path: str, max_depth: int = 3) -> dict:
 
     return _build_tree(repo_path, 1)
 
+
 def get_repo_metadata(repo_url: str) -> dict:
     """Fetches basic metadata about the repository using GitHub's public API."""
     if "github.com/" not in repo_url:
@@ -44,7 +58,7 @@ def get_repo_metadata(repo_url: str) -> dict:
 
     parts = repo_url.rstrip('/').split('github.com/')
     if len(parts) < 2:
-         return {"error": "Invalid GitHub URL format."}
+        return {"error": "Invalid GitHub URL format."}
 
     repo_path = parts[1]
     if repo_path.endswith('.git'):
@@ -117,32 +131,41 @@ def read_file_content(repo_path: str, filename: str, max_chars: int = 3000) -> s
         return ""
 
 
-def read_source_samples(repo_path: str, extensions: list = None, max_files: int = 10, max_chars_per_file: int = 4000, max_total_chars: int = 30000) -> dict:
-    """Reads a few key source files from the repo for analysis.
-
-    Uses deterministic ranking to prioritize entrypoints, models, and routes.
-    Returns a dict of {relative_path: content} for up to max_files files, respecting total char limits.
+def read_source_samples(
+    repo_path: str,
+    extensions: list = None,
+    max_files: int = 10,
+    max_chars_per_file: int = 4000,
+    max_total_chars: int = 30000,
+) -> dict:
+    """Reads key source files using deterministic priority ranking.
+    Returns {relative_path: content} for up to max_files files.
     """
     if extensions is None:
         extensions = [".py", ".js", ".ts", ".java", ".go", ".rs", ".tsx", ".jsx", ".yml", ".yaml", ".json"]
 
     # Priority keywords in filename
-    high_priority = ["main", "app", "index", "server", "routes", "api", "models", "schema", "auth", "config", "dockerfile", "docker-compose"]
+    high_priority = [
+        "main", "app", "index", "server", "routes", "api", "models",
+        "schema", "auth", "config", "dockerfile", "docker-compose",
+    ]
 
     all_files = []
 
     for root, dirs, files in os.walk(repo_path):
-        # Skip hidden dirs, node_modules, venv, __pycache__, dist, build, public, assets, vendor
         dirs[:] = [d for d in dirs if not d.startswith('.')
-                   and d not in ('node_modules', 'venv', '.venv', '__pycache__', 'dist', 'build', 'public', 'assets', 'vendor')]
+                   and d not in ('node_modules', 'venv', '.venv', '__pycache__',
+                                 'dist', 'build', 'public', 'assets', 'vendor',
+                                 'coverage', '.git')]
 
         for filename in files:
             _, ext = os.path.splitext(filename)
             if ext.lower() not in extensions and filename.lower() not in ["dockerfile"]:
                 continue
 
-            # Skip test files and simple configs for the core analysis unless strictly needed, but let's allow a few tests to be ranked lower
-            is_test = filename.startswith("test_") or filename.endswith(".spec.js") or filename.endswith("_test.go")
+            is_test = (filename.startswith("test_") or
+                       filename.endswith(".spec.js") or
+                       filename.endswith("_test.go"))
             if filename in ("package-lock.json", "yarn.lock", "pnpm-lock.yaml"):
                 continue
 
@@ -160,15 +183,13 @@ def read_source_samples(repo_path: str, extensions: list = None, max_files: int 
                 score += 20
 
             if is_test:
-                score -= 10 # Penalty for test files in standard mode (we want core logic first)
+                score -= 10
 
-            # Penalize deep nesting
             depth = rel_path.count("/")
             score -= (depth * 5)
 
             all_files.append((score, filepath, rel_path))
 
-    # Sort files by score descending
     all_files.sort(key=lambda x: x[0], reverse=True)
 
     samples = {}
@@ -182,17 +203,15 @@ def read_source_samples(repo_path: str, extensions: list = None, max_files: int 
             if content.strip():
                 if len(content) == max_chars_per_file:
                     content += "\n...(truncated)"
-
-                # Check if it fits in total char budget
                 if total_chars + len(content) > max_total_chars and len(samples) > 0:
-                    continue # Skip if it blows the budget
-
+                    continue
                 samples[rel_path] = content
                 total_chars += len(content)
         except Exception:
             continue
 
     return samples
+
 
 def compute_repo_metrics(repo_path: str) -> dict:
     """Computes deterministic metrics about the repository."""
@@ -203,15 +222,15 @@ def compute_repo_metrics(repo_path: str) -> dict:
         "lines_of_code": 0,
         "tests_found": 0,
         "docker_files": 0,
-        "github_actions": 0
+        "github_actions": 0,
     }
 
     if not os.path.exists(repo_path):
         return metrics
 
     for root, dirs, files in os.walk(repo_path):
-        # Exclude common large/hidden directories
-        dirs[:] = [d for d in dirs if d not in ('.git', 'node_modules', 'venv', '.venv', '__pycache__', 'dist', 'build')]
+        dirs[:] = [d for d in dirs if d not in (
+            '.git', 'node_modules', 'venv', '.venv', '__pycache__', 'dist', 'build')]
 
         for file in files:
             metrics["total_files"] += 1
@@ -231,7 +250,6 @@ def compute_repo_metrics(repo_path: str) -> dict:
             if ".github" in root.replace('\\', '/') and "workflows" in root.replace('\\', '/'):
                 metrics["github_actions"] += 1
 
-            # Count lines of code (simple heuristic, only for source files)
             if file_lower.endswith((".py", ".js", ".ts", ".java", ".go", ".rs", ".html", ".css", ".md")):
                 filepath = os.path.join(root, file)
                 try:
@@ -242,13 +260,24 @@ def compute_repo_metrics(repo_path: str) -> dict:
 
     return metrics
 
+
 def evaluate_basic_health(repo_path: str, metrics: dict) -> dict:
     """Evaluates basic repository health flags."""
-    health = {
+    return {
         "tests": metrics.get("tests_found", 0) > 0,
         "docker": metrics.get("docker_files", 0) > 0,
         "ci": metrics.get("github_actions", 0) > 0,
-        "readme": os.path.exists(os.path.join(repo_path, "README.md")) or os.path.exists(os.path.join(repo_path, "readme.md")),
-        "license": os.path.exists(os.path.join(repo_path, "LICENSE")) or os.path.exists(os.path.join(repo_path, "LICENSE.md")),
+        "readme": (os.path.exists(os.path.join(repo_path, "README.md")) or
+                   os.path.exists(os.path.join(repo_path, "readme.md"))),
+        "license": (os.path.exists(os.path.join(repo_path, "LICENSE")) or
+                    os.path.exists(os.path.join(repo_path, "LICENSE.md"))),
     }
-    return health
+
+
+def get_commit_sha(repo_path: str) -> str | None:
+    """Get the HEAD commit SHA of the cloned repo."""
+    try:
+        repo = Repo(repo_path)
+        return repo.head.commit.hexsha
+    except Exception:
+        return None

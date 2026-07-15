@@ -1,26 +1,26 @@
 {
   "metadata": {
-    "timestamp": "2026-07-15T12:57:09.096208Z",
+    "timestamp": "2026-07-15T14:39:13.941047Z",
     "os": "nt",
     "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
-    "git_hash": "092159e"
+    "git_hash": "8c54e89"
   },
   "runs": [
     {
       "repo_url": "https://github.com/octocat/Hello-World",
       "success": true,
-      "duration_seconds": 7.64,
-      "events": 7,
+      "duration_seconds": 9.35,
+      "events": 4,
       "test_configuration_expected_fallback": true,
-      "raw_events_file": "evidence/raw/ws_events_cd5569aa-77cd-4830-a9af-ccc15b4843dd.json"
+      "raw_events_file": "evidence/raw/ws_events_de3c0e49-43b8-4b78-8dab-164de3b0885f.json"
     },
     {
       "repo_url": "https://github.com/pallets/click",
       "success": true,
-      "duration_seconds": 9.19,
-      "events": 7,
+      "duration_seconds": 8.77,
+      "events": 4,
       "test_configuration_expected_fallback": true,
-      "raw_events_file": "evidence/raw/ws_events_6cabc6d2-34cb-4dfb-9836-8572cf6d937e.json"
+      "raw_events_file": "evidence/raw/ws_events_3fa14b30-fb0b-4e6c-a159-f0458f9fb0a8.json"
     }
   ]
 }

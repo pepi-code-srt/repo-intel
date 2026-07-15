@@ -1,55 +1,70 @@
-from langchain_core.messages import AIMessage
+"""
+RepoIntel — Repository Scanner
+Deterministic scan: clone, metadata, structure, metrics, health.
+Zero AI calls. All Python.
+"""
+import logging
 from .state import RepoIntelState
-from ..mcp_server.tools.github_tools import (
+from ..utils.repo_tools import (
     clone_repo, get_repo_structure, get_repo_metadata,
     read_file_content, read_source_samples,
-    compute_repo_metrics, evaluate_basic_health
+    compute_repo_metrics, evaluate_basic_health, get_commit_sha,
 )
 
+logger = logging.getLogger(__name__)
+
+
 def repo_scanner_agent(state: RepoIntelState) -> dict:
+    """Clones and scans a repository. Zero AI calls."""
     repo_url = state["repo_url"]
-    
+    logger.info("Scanning repository: %s", repo_url)
+
     # Clone the repo
     repo_path = clone_repo(repo_url)
-    
+
     if repo_path.startswith("Error"):
+        logger.error("Clone failed: %s", repo_path)
         return {
-            "messages": [AIMessage(content=f"Failed to clone: {repo_path}")],
+            "repo_path": "",
             "repo_structure": {"_error": repo_path},
             "repo_metadata": {"error": repo_path, "full_name": repo_url},
+            "readme_content": "",
+            "dependencies": [],
+            "source_samples": {},
             "repo_statistics": {},
             "repo_health": {},
+            "analyzed_commit_sha": None,
         }
-        
+
     # Get metadata (stars, forks, languages, contributors)
     metadata = get_repo_metadata(repo_url)
-    
-    # Handle GitHub API failures (e.g. rate limit, 404, invalid link) gracefully
+
+    # Handle GitHub API failures gracefully
     if "error" in metadata:
         metadata = {
             "full_name": repo_url.split("github.com/")[-1] if "github.com/" in repo_url else "Unknown Repository",
             "description": "Metadata fetch failed: " + metadata["error"],
             "stars": 0, "forks": 0, "open_issues": 0,
             "language": "Unknown", "languages": {},
-            "contributors": [], "license": None
+            "contributors": [], "license": None,
         }
-    
+
     # Get full directory structure
     structure = get_repo_structure(repo_path)
-    
-    # Read README.md
+
+    # Read README
     readme = read_file_content(repo_path, "README.md", max_chars=4000)
-    
+
     # Read dependency files
     dependencies = []
-    
+
     # Python deps
     req_txt = read_file_content(repo_path, "requirements.txt", max_chars=2000)
     if req_txt:
-        deps = [line.strip() for line in req_txt.split("\n") 
+        deps = [line.strip() for line in req_txt.split("\n")
                 if line.strip() and not line.strip().startswith("#")]
         dependencies.extend([f"pip: {d}" for d in deps])
-    
+
     # Node deps
     pkg_json = read_file_content(repo_path, "package.json", max_chars=2000)
     if pkg_json:
@@ -62,44 +77,30 @@ def repo_scanner_agent(state: RepoIntelState) -> dict:
                 dependencies.append(f"npm-dev: {dep_name}")
         except json.JSONDecodeError:
             pass
-    
-    # Read sample source files for downstream agents
-    source_samples = read_source_samples(repo_path, max_files=4, max_chars_per_file=2000)
-    
-    # Build a rich deterministic summary (0 LLM tokens used)
+
+    # Read sample source files
+    source_samples = read_source_samples(repo_path)
+
+    # Compute metrics
+    metrics = compute_repo_metrics(repo_path)
+    health = evaluate_basic_health(repo_path, metrics)
+
+    # Get commit SHA
+    commit_sha = get_commit_sha(repo_path)
+
+    # Build summary
     primary_lang = metadata.get("language", "Unknown")
     languages = metadata.get("languages", {})
     lang_str = ", ".join([f"{lang} ({pct}%)" for lang, pct in languages.items()]) if languages else primary_lang
-    
-    contributors = metadata.get("contributors", [])
-    contrib_str = ", ".join([f"{c['login']} ({c['contributions']} commits)" for c in contributors]) if contributors else "Unknown"
-    
-    frameworks = []
-    if "package.json" in structure:
-        frameworks.append("Node.js/NPM")
-    if "requirements.txt" in structure or "pyproject.toml" in structure:
-        frameworks.append("Python")
-    if "Dockerfile" in structure:
-        frameworks.append("Docker")
-    if "docker-compose.yml" in structure or "docker-compose.yaml" in structure:
-        frameworks.append("Docker Compose")
-    if ".github" in structure:
-        frameworks.append("GitHub Actions")
-    
-    findings = f"""Repo Scanner Findings:
-- Name: {metadata.get('full_name', 'Unknown')}
-- Description: {metadata.get('description', 'No description')}
-- Languages: {lang_str}
-- Frameworks: {', '.join(frameworks) if frameworks else 'None detected'}
-- Stars: {metadata.get('stars', 0)} | Forks: {metadata.get('forks', 0)} | Open Issues: {metadata.get('open_issues', 0)}
-- Contributors: {contrib_str}
-- License: {metadata.get('license', 'None')}
-- Dependencies: {len(dependencies)} packages found
-- Source files sampled: {len(source_samples)} files"""
-    
-    metrics = compute_repo_metrics(repo_path)
-    health = evaluate_basic_health(repo_path, metrics)
-    
+
+    logger.info(
+        "Scan complete: %s — %d files, %d LOC, languages: %s",
+        metadata.get("full_name", "?"),
+        metrics.get("total_files", 0),
+        metrics.get("lines_of_code", 0),
+        lang_str,
+    )
+
     return {
         "repo_path": repo_path,
         "repo_structure": structure,
@@ -109,5 +110,5 @@ def repo_scanner_agent(state: RepoIntelState) -> dict:
         "source_samples": source_samples,
         "repo_statistics": metrics,
         "repo_health": health,
-        "messages": [AIMessage(content=findings.strip())]
+        "analyzed_commit_sha": commit_sha,
     }
