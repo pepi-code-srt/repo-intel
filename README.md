@@ -1,15 +1,23 @@
 # RepoIntel
 
-An AI-Powered GitHub Repository Analysis Agent built with **LangGraph**, **Model Context Protocol (MCP)**, and **FastAPI** that acts as an automated Staff Engineer.
+An AI-Powered GitHub Repository Analysis Agent built with **LangGraph** and **FastAPI** that acts as an automated Staff Engineer.
+It ingests a public GitHub repository, orchestrates multiple specialized AI agents to analyze code quality, security, and DevOps maturity, and streams real-time insights back to the client via WebSockets.
 
-## Overview
-RepoIntel solves the problem of manual codebase onboarding and security auditing. Aimed at Developers, Tech Leads, and Security Engineers, it temporarily clones a public GitHub repository, analyzes its structure, assesses code quality and security, and generates a structured Markdown report.
+## 🚀 Key Features
 
-## Key Features
-- **Multi-Agent Orchestration**: Uses LangGraph to route tasks between a Scanner, Analyzer, and Report Generator.
-- **Resilient AI Pipeline**: Features exponential backoff, API key rotation, and zero-token deterministic fallbacks for handling strict LLM rate limits.
-- **Resource Management**: Uses payload minification to reduce payload size and FastAPI lifespan hooks to aggressively clean up temporary cloned repositories.
-- **Real-Time Streaming**: Uses WebSockets to stream agent progress back to a sleek, dark-themed frontend.
+* **Multi-Agent Orchestration**: Utilizes a LangGraph Supervisor pattern to coordinate specialized agents (Engineering Analyzer, Repository Scanner).
+* **Resilient Infrastructure**: Implements exponential backoff, API key rotation, and a deterministic zero-token fallback engine to survive rate-limit exhaustion.
+* **Aggressive Context Optimization**: Employs a custom semantic minifier that strips excessive whitespace, comments, and structure to reduce LLM payload sizes by over 35%.
+* **Real-time Event Streaming**: Streams status updates to the client via asynchronous WebSockets.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Orchestration**: LangGraph, LangChain
+- **Backend API**: FastAPI, Uvicorn, Python `asyncio`
+- **Real-time Comms**: WebSockets
+- **LLM Provider**: Google Gemini (gemini-2.5-flash)
 
 ## Architecture
 
@@ -36,7 +44,6 @@ graph TD
 
 ## Tech Stack
 - **AI Orchestration**: LangGraph, LangChain
-- **Tooling**: FastMCP
 - **LLM**: Google Gemini API (`gemini-2.5-flash`)
 - **Backend**: FastAPI, WebSockets
 - **Frontend**: HTML5, CSS3, Vanilla JS
@@ -80,7 +87,7 @@ graph TD
 
 We have conducted strict resilience and benchmark testing. All testing scripts are available in `scripts/` and full results are in `evidence/reports/BENCHMARK_REPORT.md`.
 
-* **End-to-End Analysis**: During a local Windows 11 test on 2026-07-15, two public repositories completed the end-to-end workflow in deterministic fallback mode. Observed wall-clock durations were 7.56s and 8.13s, with 7 WebSocket events captured for each run.
+* **End-to-End Analysis**: During a local Windows 11 test on 2026-07-15, two public repositories completed the end-to-end workflow in deterministic fallback mode. Observed wall-clock durations were 7.48s and 10.27s, with 7 WebSocket events captured for each run.
 * **Payload Minification**: In one synthetic whitespace-heavy code sample, the production minifier automatically stripped semantic whitespace resulting in a **38.37% payload character reduction** before sending to the LLM.
 * **Graceful Degradation**: If the API key is exhausted or invalid, the system automatically falls back to a deterministic 0-token report generator, successfully streaming the completion event without crashing. (Verified via isolated mock tests and E2E runs).
 

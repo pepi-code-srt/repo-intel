@@ -31,7 +31,7 @@ I created a custom testing suite (`scripts/run_benchmarks.py` and `scripts/test_
 
 ## Verified Results
 - **Resilience**: In one synthetic whitespace-heavy code sample, the production minifier reduced character count from 86 to 53 (38.37%). 2/2 test-created Repo-Intel temporary directories were successfully removed.
-- **Performance**: During a local Windows 11 test on 2026-07-15, two public repositories completed the end-to-end workflow in deterministic fallback mode. Observed wall-clock durations were 7.56s and 8.13s.
+- **Performance**: During a local Windows 11 test on 2026-07-15, two public repositories completed the end-to-end workflow in deterministic fallback mode. Observed wall-clock durations were 7.48s and 10.27s.
 
 ## Limitations
 - The system currently only supports public repositories via unauthenticated `git clone`.
