@@ -1,14 +1,18 @@
 [project]
 name = "repo-intel"
-version = "0.1.0"
-description = "AI-Powered GitHub Repository Analysis Agent"
+version = "2.0.0"
+description = "AI-Powered GitHub Repository Analysis — Task-Based Model Routing"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi",
     "uvicorn",
+    "google-genai",
     "langgraph",
-    "langchain-core",
-    "langchain-google-genai",
-    "mcp",
+    "pydantic",
+    "python-dotenv",
     "gitpython",
+    "requests",
+    "httpx",
+    "websockets",
+    "jinja2",
 ]

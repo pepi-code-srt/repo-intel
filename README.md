@@ -1,100 +1,94 @@
 # RepoIntel
 
-An AI-Powered GitHub Repository Analysis Agent built with **LangGraph** and **FastAPI** that acts as an automated Staff Engineer.
-It ingests a public GitHub repository, orchestrates multiple specialized AI agents to analyze code quality, security, and DevOps maturity, and streams real-time insights back to the client via WebSockets.
+AI-powered repository intelligence for public GitHub repositories.
 
-## 🚀 Key Features
+RepoIntel clones and structurally analyzes a repository, selects the most relevant source evidence, and uses task-routed Gemini models to produce an evidence-based engineering review covering architecture, security, code quality, testing, and production readiness.
 
-* **Multi-Agent Orchestration**: Utilizes a LangGraph Supervisor pattern to coordinate specialized agents (Engineering Analyzer, Repository Scanner).
-* **Resilient Infrastructure**: Implements exponential backoff, API key rotation, and a deterministic zero-token fallback engine to survive rate-limit exhaustion.
-* **Payload Minification**: Uses a lightweight preprocessor to remove blank lines and trailing whitespace before selected code/configuration content is sent to the LLM.
-* **Real-time Event Streaming**: Streams status updates to the client via asynchronous WebSockets.
+## What It Does
 
----
-
-## 🛠️ Technology Stack
-
-- **Orchestration**: LangGraph, LangChain
-- **Backend API**: FastAPI, Uvicorn, Python `asyncio`
-- **Real-time Comms**: WebSockets
-- **LLM Provider**: Google Gemini (gemini-2.5-flash)
-
-## Architecture
-
-```mermaid
-graph TD
-    User([User URL Input]) --> WS[FastAPI WebSocket]
-    WS --> Supervisor[LangGraph Supervisor]
-    
-    Supervisor --> Scanner[Repo Scanner Agent]
-    Scanner --> |git clone, parse structure| Supervisor
-    
-    Supervisor --> Analyzer[Engineering Analyzer]
-    Analyzer --> |LLM context minification| Gemini[Google Gemini API]
-    Analyzer --> |Error: 429| Fallback[Zero-Token Fallback]
-    Fallback --> Supervisor
-    Gemini --> Supervisor
-    
-    Supervisor --> Generator[Report Generator]
-    Generator --> |Markdown synthesis| Supervisor
-    
-    Supervisor --> Cleanup[shutil.rmtree /tmp/repo-intel-*]
-    Cleanup --> Final[Final Report Delivered]
+```text
+GitHub Repository
+    ↓
+Deterministic Structural Scan
+    ↓
+Evidence Selection
+    ↓
+Fast Repository Classification
+    ↓
+Deep Engineering Review
+    ↓
+Validated Intelligence Report
 ```
 
-## Tech Stack
-- **AI Orchestration**: LangGraph, LangChain
-- **LLM**: Google Gemini API (`gemini-2.5-flash`)
-- **Backend**: FastAPI, WebSockets
-- **Frontend**: HTML5, CSS3, Vanilla JS
+## Current AI Pipeline
 
-## Getting Started
+- **Structural analysis**: Deterministic Python (LangGraph workflow)
+- **Fast classification**: Gemini 3.1 Flash Lite
+- **Primary engineering review**: Gemini 3.5 Flash
+- **Report rendering**: Deterministic Python
+- **Failure mode**: Structural analysis fallback
 
-1. Clone the repository and navigate to it:
-   ```bash
-   git clone https://github.com/pepi-code-srt/repo-intel.git
-   cd repo-intel
-   ```
+The architecture uses **task-based model routing** rather than a supervisor loop, applying a strong, capable model (Gemini 3.5 Flash) only when deep semantic understanding is necessary, and utilizing a faster, more economical model (Gemini 3.1 Flash Lite) for simple classification tasks. An automatic **model cascade** is in place: if the primary model hits rate limits or is unavailable, requests failover seamlessly to a fallback model.
 
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   # On Windows:
-   .\venv\Scripts\activate
-   # On Mac/Linux:
-   source venv/bin/activate
-   ```
+## Features
 
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+- **Evidence Selection**: Deterministically selects the most critical files (Dockerfiles, main APIs, config) to stay within budget constraints.
+- **Model Cascade**: Fails gracefully if Gemini 3.5 Flash is busy, switching to Gemini 3.1 Flash Lite automatically.
+- **Structural Fallback**: If all AI models are unavailable (e.g., API keys revoked or quota exhausted), RepoIntel still generates a structural report detailing file counts, languages, CI presence, and basic health metrics.
+- **Real-Time Progress**: Powered by FastAPI and WebSockets, users receive real-time granular progress (including per-stage timing) in the frontend.
+- **Safe Resource Limits**: Shallow cloning restricts the download depth of repositories, and temporary repositories are safely cleaned up automatically.
 
-4. Set up your environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-   *Edit `.env` and add your Google Gemini API key.*
+## Verified Run
 
-5. Run the server:
-   ```bash
-   uvicorn src.main:app --reload
-   ```
+RepoIntel successfully analyzed its own repository (V2 Runtime):
 
-6. Open your browser to `http://localhost:8000` and paste a GitHub URL!
+- 39 files scanned
+- 2,595 lines of code
+- 15 evidence files selected
+- 31,354 evidence characters
+- 2 successful AI calls
+- Analysis mode: AI Enhanced
+- Final engineering score: 6.3/10
 
-## Evaluation / Benchmarks
+## Quick Start
 
-We have conducted strict resilience and benchmark testing. All testing scripts are available in `scripts/` and full results are in `evidence/reports/BENCHMARK_REPORT.md`.
+### 1. Requirements
 
-* **End-to-End Analysis**: During a local Windows 11 test on 2026-07-15, two public repositories completed the end-to-end workflow in deterministic fallback mode. Observed wall-clock durations were 7.64s and 9.19s, with 7 WebSocket events captured for each run.
-* **Payload Minification**: In one synthetic whitespace-heavy code sample, the production minifier removed blank lines and trailing whitespace, reducing the character count from 86 to 53 (**38.37%**).
-* **Graceful Degradation**: If the API key is exhausted or invalid, the system automatically falls back to a deterministic 0-token report generator, successfully streaming the completion event without crashing. (Verified via isolated mock tests and E2E runs).
+- Python 3.12+
+- Gemini API Key
 
-## Limitations
-- **Public Repositories Only**: Currently relies on unauthenticated `git clone`, so it cannot analyze private repositories.
-- **Large Repositories**: Large monorepos may still hit context limits if they contain too many massive files.
+### 2. Setup
 
-## Future Improvements
-- Integrate GitHub OAuth for private repository scanning.
-- Replace in-memory `jobs` dictionary with Redis for horizontal scalability.
+```bash
+python -m venv venv
+# Windows
+.\venv\Scripts\Activate.ps1
+# Linux/Mac
+source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+### 3. Configuration
+
+Create a `.env` file in the root directory:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+### 4. Run the Server
+
+```bash
+uvicorn src.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Open `http://127.0.0.1:8000` in your browser.
+
+## Docker Deployment
+
+You can also run RepoIntel using Docker Compose:
+
+```bash
+docker-compose up --build
+```

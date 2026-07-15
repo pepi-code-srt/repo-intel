@@ -1,8 +1,9 @@
 {
   "minification": {
-    "raw_length": 86,
+    "raw_length": 60,
     "minified_length": 53,
-    "reduction_percent": 38.37
+    "reduction_percent": 11.67,
+    "success": true
   },
   "cleanup": {
     "created": 2,
@@ -10,22 +11,15 @@
     "remaining": 0,
     "success": true
   },
-  "api_rotation": {
+  "fail_fast_auth": {
     "success": true
   },
-  "exponential_backoff": {
+  "model_cascade": {
     "success": true,
-    "sleep_sequence": [
-      2,
-      4,
-      8
-    ]
-  },
-  "all_keys_exhausted": {
-    "success": true
+    "model_used": "model-2"
   },
   "deterministic_fallback": {
     "success": true,
-    "status": "QuotaExceeded"
+    "status": "Not scored (Structural Analysis)"
   }
 }

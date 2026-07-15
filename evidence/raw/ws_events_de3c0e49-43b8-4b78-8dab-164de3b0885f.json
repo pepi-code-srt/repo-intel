@@ -1,0 +1,21 @@
+[
+  {
+    "type": "progress",
+    "agent": "repo_scanner",
+    "message": "Repository cloned and structural scan completed"
+  },
+  {
+    "type": "progress",
+    "agent": "engineering_analyzer",
+    "message": "Continuing with Structural Analysis"
+  },
+  {
+    "type": "progress",
+    "agent": "report_generator",
+    "message": "Final report generated"
+  },
+  {
+    "type": "completed",
+    "report": "# \ud83d\udd0d Intelligence Report: octocat/Hello-World\n\n**Verdict: Insufficient Data (Structural Mode)** | **Overall Score: N/A/10**\n\n> *Generated July 15, 2026 at 14:39 UTC*\n\n**Provenance:**\n- **Analysis Mode**: Structural\n- **AI Provider**: None\n- **Cached Analysis**: No\n- **Structural Scan**: Completed\n- **AI Analysis**: Not completed\n\n---\n\n## \ud83d\udcca Scorecard\n\n| Category | Score | Verdict |\n|---|---|---|\n| Code Quality & Architecture | None/10 | Not scored (Structural) |\n| Security | None/10 | Not scored (Structural) |\n| DevOps & Production Readiness | None/10 | Not scored (Structural) |\n\n---\n\n## \ud83d\udcc8 Codebase Stats\n\n| Metric | Value |\n|---|---|\n| Total Files | 1 |\n| Lines of Code | 0 |\n| Test Files | 0 |\n| Docker Files | 0 |\n| CI Workflows | 0 |\n| Stars | \u2b50 3700 |\n| Forks | \ud83c\udf74 6242 |\n\n---\n\n## \ud83d\udea8 What's Missing (That Should Exist)\n\n- \ud83d\udd34 No automated tests detected \u2014 critical logic is unverified\n- \ud83d\udd34 No Docker configuration \u2014 not containerized for deployment\n- \ud83d\udd34 No CI/CD pipeline \u2014 code changes aren't automatically validated\n- \ud83d\udd34 No LICENSE file \u2014 legal usage is undefined\n- \ud83d\udd34 No README \u2014 project is undocumented\n- \ud83d\udd34 Zero test files found across entire codebase\n\n---\n\n## \ud83d\udd34 Critical Risks\n\n- None detected\n\n---\n\n## \ud83d\udfe1 Technical Debt\n\n- \u26a0\ufe0f Not detected: README\n- \u26a0\ufe0f Not detected: Docker config\n- \u26a0\ufe0f Not detected: CI workflows\n- \u26a0\ufe0f Not detected: Test files\n\n---\n\n## \ud83d\udfe2 What's Done Right\n\n- \u2705 Detected: 1 files\n- \u2705 Detected: 0 LOC\n\n---\n\n## \ud83d\uddfa\ufe0f Action Plan\n\n### Immediate (This Week)\n1. AI enhancement unavailable. Run with a valid AI provider to generate deeper recommendations.\n2. AI enhancement unavailable. Run with a valid AI provider to generate deeper recommendations.\n3. AI enhancement unavailable. Run with a valid AI provider to generate deeper recommendations.\n\n### Short-Term (This Month)\n- None\n\n### Long-Term (This Quarter)\n- None\n"
+  }
+]
