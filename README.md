@@ -28,7 +28,7 @@ Engineering Intelligence Report
 
 ## Architecture
 
-[Architecture Image Placeholder]
+![RepoIntel Architecture](assets/repointel_architecture.png)
 
 ## How It Works
 
