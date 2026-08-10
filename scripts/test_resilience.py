@@ -5,6 +5,10 @@ import json
 import uuid
 from unittest.mock import patch, MagicMock
 
+# --- MOCK ENV VARS FOR TESTING ---
+# Must be set BEFORE importing src modules to satisfy config.py
+os.environ["GEMINI_API_KEY"] = "mock_key_for_testing"
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.utils.text_utils import minify_content
