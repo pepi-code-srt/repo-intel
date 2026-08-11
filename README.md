@@ -2,7 +2,11 @@
 
 AI-powered repository intelligence for public GitHub repositories.
 
-[Interface Demo Placeholder]
+[Interface Demo Placeholder] 
+
+https://github.com/user-attachments/assets/1569206e-aef2-4779-88af-6c34e2f874ab
+
+
 
 ## What It Does
 
