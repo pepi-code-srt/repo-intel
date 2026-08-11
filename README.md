@@ -244,6 +244,12 @@ RepoIntel successfully analyzed its own repository using the V2 runtime.
 * Gemini API key
 
 ### Installation
+```bash
+How to Open CMD -->Press Windows Key + R on your keyboard.Type cmd into the box.Press Enter.Basic Steps to FollowType cd followed by a space to change folders.Type your folder path or name.Press Enter to run the Below command
+```
+```bash
+git clone https://github.com/pepi-code-srt/repo-intel
+```
 
 ```bash
 python -m venv venv
