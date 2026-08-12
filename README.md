@@ -177,6 +177,7 @@ RepoIntel successfully analyzed its own repository using the V2 runtime.
 * **Analysis mode:** AI Enhanced
 
 ## Sample Output
+<img width="422" height="847" alt="Screenshot 2026-08-11 160925" src="https://github.com/user-attachments/assets/f6e5fbf4-61a6-435f-89bc-c4a3d260cb4e" />
 
 <!-- TODO: Add screenshots after running RepoIntel on a public repo -->
 <!-- 1. Screenshot of the browser UI showing analysis in progress -->
@@ -193,6 +194,7 @@ RepoIntel successfully analyzed its own repository using the V2 runtime.
 ```bash
 How to Open CMD -->Press Windows Key + R on your keyboard.Type cmd into the box.Press Enter.Basic Steps to FollowType cd followed by a space to change folders.Type your folder path or name.Press Enter to run the Below command
 ```
+
 ```bash
 git clone https://github.com/pepi-code-srt/repo-intel
 ```
