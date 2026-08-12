@@ -32,110 +32,50 @@ Engineering Intelligence Report
 
 ## Architecture
 
-![RepoIntel Architecture](assets/repointel_architecture.png)
+```mermaid
+flowchart TD
+    User["🌐 User (Browser)"]
+    FastAPI["⚙️ FastAPI + WebSocket Server"]
+    Scanner["repo_scanner_agent"]
+    Clone["Shallow Clone"]
+    Structural["Structural Scan\n(files, languages, CI/CD, configs)"]
+    Evidence["evidence_selector.py\n(Dockerfiles, entry points, API files,\nCI/CD, config, source modules)"]
+    Skip{"_should_skip_analysis"}
+    Analyzer["engineering_analyzer_agent"]
+    Router["model_router.py"]
+    Primary["Gemini 3.5 Flash\n(Primary)"]
+    Fallback["Gemini 3.1 Flash Lite\n(Fallback)"]
+    Reporter["report_generator_agent"]
+    StructReport["Structural Fallback Report"]
+    FullReport["Engineering Intelligence Report"]
+    WS["WebSocket Progress Events"]
 
-## How It Works
+    User -->|"POST /api/analyze\n(GitHub URL)"| FastAPI
+    FastAPI -->|"LangGraph Workflow"| Scanner
+    Scanner --> Clone
+    Clone --> Structural
+    Structural --> Evidence
+    Evidence --> Skip
 
-### 1. Repository Scanning
+    Skip -->|"Scan OK"| Analyzer
+    Skip -->|"Scan Failed"| Reporter
 
-The `repo_scanner_agent` shallow-clones the target GitHub repository and performs deterministic structural analysis.
+    Analyzer --> Router
+    Router --> Primary
+    Primary -->|"Rate limit / error"| Fallback
+    Primary -->|"Success"| Reporter
+    Fallback -->|"Success"| Reporter
+    Fallback -->|"All models failed"| Reporter
 
-It identifies information such as:
+    Reporter -->|"AI available"| FullReport
+    Reporter -->|"AI unavailable"| StructReport
 
-* File structure
-* File counts
-* Programming languages
-* CI/CD configuration
-* Important project configuration files
+    FullReport --> WS
+    StructReport --> WS
+    WS -->|"ws://host/api/ws/{job_id}"| User
 
-The scanner does not require an LLM.
-
-### 2. Evidence Selection
-
-The `evidence_selector.py` component deterministically selects the most relevant files for semantic analysis.
-
-Examples include:
-
-* `Dockerfile`
-* Application entry points
-* API files
-* Configuration files
-* CI/CD files
-* Important source modules
-
-This prevents the entire repository from being unnecessarily passed to the LLM.
-
-### 3. Conditional Routing
-
-After repository scanning, the workflow evaluates whether semantic analysis should continue.
-
-If the repository scan fails — for example, because the repository cannot be found — the workflow skips the AI analysis phase and proceeds directly to report generation.
-
-```text
-Repository Scan
-      │
-      ├── Failure → Structural Report
-      │
-      └── Success → Engineering Analysis
-```
-
-### 4. Engineering Analysis
-
-The `engineering_analyzer_agent` receives the selected repository evidence and performs semantic engineering analysis using Gemini.
-
-The analysis focuses on areas such as:
-
-* Architecture
-* Code quality
-* Security
-* Testing
-* DevOps practices
-* Production readiness
-
-### 5. Model Cascade
-
-RepoIntel uses a primary Gemini model for engineering analysis.
-
-If the primary model becomes unavailable or encounters a supported failure such as a rate limit, the request can fall back to the configured fallback model.
-
-This prevents a temporary model failure from immediately terminating the analysis.
-
-### 6. Report Generation
-
-The `report_generator_agent` combines:
-
-* Deterministic repository information
-* Selected evidence
-* AI analysis
-
-and produces the final engineering review.
-
-If semantic analysis was skipped or unavailable, the system generates a deterministic structural fallback report instead.
-
-## Architecture Flow
-
-```text
-GitHub URL
-    ↓
-repo_scanner_agent
-    ├── shallow clone
-    ├── structural scan
-    └── evidence selection
-    ↓
-_should_skip_analysis
-    ├── Failure → report_generator_agent
-    │              ↓
-    │       Structural Report
-    │
-    └── Success
-           ↓
-    engineering_analyzer_agent
-           ↓
-      Model Cascade
-           ↓
-    report_generator_agent
-           ↓
-    Engineering Report
+    Scanner -.->|"progress events"| WS
+    Analyzer -.->|"progress events"| WS
 ```
 
 ## Design Decisions
@@ -235,6 +175,12 @@ RepoIntel successfully analyzed its own repository using the V2 runtime.
 * **2 successful AI calls**
 * **6.3/10 engineering score**
 * **Analysis mode:** AI Enhanced
+
+## Sample Output
+
+<!-- TODO: Add screenshots after running RepoIntel on a public repo -->
+<!-- 1. Screenshot of the browser UI showing analysis in progress -->
+<!-- 2. Screenshot of the final engineering report output -->
 
 ## Quick Start
 
