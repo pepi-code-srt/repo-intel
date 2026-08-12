@@ -179,6 +179,10 @@ RepoIntel successfully analyzed its own repository using the V2 runtime.
 ## Sample Output
 <img width="422" height="847" alt="Screenshot 2026-08-11 160925" src="https://github.com/user-attachments/assets/f6e5fbf4-61a6-435f-89bc-c4a3d260cb4e" />
 
+## TerminalOutput
+<img width="1496" height="480" alt="image" src="https://github.com/user-attachments/assets/6c19da23-e499-4080-9cf2-cab8d28e3897" />
+
+
 <!-- TODO: Add screenshots after running RepoIntel on a public repo -->
 <!-- 1. Screenshot of the browser UI showing analysis in progress -->
 <!-- 2. Screenshot of the final engineering report output -->
